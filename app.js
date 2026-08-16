@@ -8,9 +8,21 @@ function safeUrl(s){try{const u=new URL(s);return /^https?:$/.test(u.protocol)?u
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function transform(k){const e=state.options[k].edit;return `translate(${e.x}%,${e.y}%) scale(${e.zoom}) rotate(${e.rotation}deg)`}
 function paint(k){$(`preview${k}`).style.transform=transform(k)}
+function autoFrame(k,img){
+  const box=$(`upload${k}`);
+  if(!img?.naturalWidth||!img?.naturalHeight||!box)return;
+  const frameRatio=(box.clientWidth||16)/(box.clientHeight||9);
+  const imageRatio=img.naturalWidth/img.naturalHeight;
+  let zoom=imageRatio>frameRatio?imageRatio/frameRatio:frameRatio/imageRatio;
+  zoom=Math.max(1,Math.min(zoom,3));
+  state.options[k].edit={zoom:+zoom.toFixed(2),x:0,y:0,rotation:0};
+  $(`zoom${k}`).value=state.options[k].edit.zoom;
+  $(`x${k}`).value=0;$(`y${k}`).value=0;
+  paint(k);
+}
 for(const k of ['A','B']){
   document.querySelector(`[data-upload="${k}"]`).onclick=()=>$( `file${k}`).click();
-  $(`file${k}`).onchange=e=>{const f=e.target.files[0];if(!f)return;state.options[k].file=f;state.options[k].image=URL.createObjectURL(f);state.options[k].edit={zoom:1,x:0,y:0,rotation:0};$(`zoom${k}`).value=1;$(`x${k}`).value=0;$(`y${k}`).value=0;const im=$(`preview${k}`);im.src=state.options[k].image;im.classList.remove('hidden');document.querySelector(`[data-upload="${k}"]`).classList.add('hidden');$(`edit${k}`).classList.remove('hidden');paint(k)};
+  $(`file${k}`).onchange=e=>{const f=e.target.files[0];if(!f)return;state.options[k].file=f;state.options[k].image=URL.createObjectURL(f);state.options[k].edit={zoom:1,x:0,y:0,rotation:0};const im=$(`preview${k}`);im.onload=()=>autoFrame(k,im);im.src=state.options[k].image;im.classList.remove('hidden');document.querySelector(`[data-upload="${k}"]`).classList.add('hidden');$(`edit${k}`).classList.remove('hidden')};
   $(`zoom${k}`).oninput=e=>{state.options[k].edit.zoom=+e.target.value;paint(k)};
   $(`x${k}`).oninput=e=>{state.options[k].edit.x=+e.target.value;paint(k)};
   $(`y${k}`).oninput=e=>{state.options[k].edit.y=+e.target.value;paint(k)};
