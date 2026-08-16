@@ -7,22 +7,64 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand">TIEBREAK</div>
-  <button class="secondary small" data-go="homeView">New Tiebreak</button>
-</header>
+<header class="topbar"><div class="brand">TIEBREAK</div><button class="secondary small" data-go="homeView">New Tiebreak</button></header>
 <main>
-  <section id="homeView" class="view active">
-    <div class="hero"><span class="eyebrow">STOP OVERTHINKING IT</span><h1>Two options.<br><span>One answer.</span></h1><p>Upload two choices. Get a quick Tiebreak pick. Then send the decision to friends and let them vote.</p><button class="primary hero-btn" data-go="createView">Create a Tiebreak →</button></div>
-  </section>
-  <section id="createView" class="view">
-    <div class="panel"><span class="eyebrow">CREATE</span><h2>What are you deciding?</h2><label>Question</label><input id="questionInput" value="Which should I choose?" maxlength="120"><label>Context <span class="muted">optional</span></label><textarea id="contextInput" placeholder="Anything people should know?"></textarea>
-      <div class="options-grid">
-        <div class="option-editor"><div class="option-badge">A</div><input id="optionAName" value="Option A"><div class="upload-box" id="uploadA"><input id="fileA" type="file" accept="image/*" hidden><button class="upload-cta" data-upload="A">Choose photo</button><img id="previewA" class="preview hidden" alt="Option A preview"></div><div class="edit-controls hidden" id="editA"><label>Zoom <input id="zoomA" type="range" min="0.25" max="3" step="0.05" value="1"></label><label>Move left / right <input id="xA" type="range" min="-50" max="50" step="1" value="0"></label><label>Move up / down <input id="yA" type="range" min="-50" max="50" step="1" value="0"></label><div class="control-row"><button class="secondary" data-rotate="A">Rotate</button><button class="secondary" data-fit="A">Fit / Reset</button></div></div><input id="optionALink" type="url" placeholder="Paste Amazon, Walmart, Vrbo or other link"><input id="optionAPrice" placeholder="Price (optional)"></div>
-        <div class="option-editor"><div class="option-badge">B</div><input id="optionBName" value="Option B"><div class="upload-box" id="uploadB"><input id="fileB" type="file" accept="image/*" hidden><button class="upload-cta" data-upload="B">Choose photo</button><img id="previewB" class="preview hidden" alt="Option B preview"></div><div class="edit-controls hidden" id="editB"><label>Zoom <input id="zoomB" type="range" min="0.25" max="3" step="0.05" value="1"></label><label>Move left / right <input id="xB" type="range" min="-50" max="50" step="1" value="0"></label><label>Move up / down <input id="yB" type="range" min="-50" max="50" step="1" value="0"></label><div class="control-row"><button class="secondary" data-rotate="B">Rotate</button><button class="secondary" data-fit="B">Fit / Reset</button></div></div><input id="optionBLink" type="url" placeholder="Paste Amazon, Walmart, Vrbo or other link"><input id="optionBPrice" placeholder="Price (optional)"></div>
-      </div><button id="decideBtn" class="primary wide">Break the tie →</button></div>
-  </section>
+  <section id="homeView" class="view active"><div class="hero"><span class="eyebrow">STOP OVERTHINKING IT</span><h1>Two options.<br><span>One answer.</span></h1><p>Add two choices. Get a quick Tiebreak pick. Then send the decision to friends and let them vote.</p><button class="primary hero-btn" data-go="createView">Create a Tiebreak →</button></div></section>
+
+  <section id="createView" class="view"><div class="panel"><span class="eyebrow">CREATE</span><h2>What are you deciding?</h2><label>Question</label><input id="questionInput" value="Which should I choose?" maxlength="120"><label>Context <span class="muted">optional</span></label><textarea id="contextInput" placeholder="Anything people should know?"></textarea>
+    <div class="options-grid">
+      <div class="option-editor">
+        <div class="option-badge">A</div>
+        <input id="optionAName" value="Option A">
+        <div class="source-box" id="uploadA">
+          <input id="fileA" type="file" accept="image/*" hidden>
+          <img id="previewA" class="preview hidden" alt="Option A preview">
+          <div class="source-actions" id="sourceActionsA">
+            <button class="upload-cta" data-upload="A">Upload photo</button>
+            <span class="or-label">or paste a link</span>
+            <input id="optionALink" type="url" placeholder="Amazon, Walmart, Vrbo, etc.">
+          </div>
+        </div>
+        <button id="editA" class="secondary wide hidden edit-photo-btn" data-edit-photo="A">Edit photo</button>
+        <input id="optionAPrice" placeholder="Price (optional)">
+      </div>
+
+      <div class="option-editor">
+        <div class="option-badge">B</div>
+        <input id="optionBName" value="Option B">
+        <div class="source-box" id="uploadB">
+          <input id="fileB" type="file" accept="image/*" hidden>
+          <img id="previewB" class="preview hidden" alt="Option B preview">
+          <div class="source-actions" id="sourceActionsB">
+            <button class="upload-cta" data-upload="B">Upload photo</button>
+            <span class="or-label">or paste a link</span>
+            <input id="optionBLink" type="url" placeholder="Amazon, Walmart, Vrbo, etc.">
+          </div>
+        </div>
+        <button id="editB" class="secondary wide hidden edit-photo-btn" data-edit-photo="B">Edit photo</button>
+        <input id="optionBPrice" placeholder="Price (optional)">
+      </div>
+    </div>
+    <button id="decideBtn" class="primary wide">Break the tie →</button>
+  </div></section>
+
   <section id="verdictView" class="view"><div class="panel center"><span class="eyebrow">TIEBREAK PICK</span><h2 id="verdictQuestion"></h2><div class="winner"><span id="verdictLetter">A</span><div><small>Pick</small><h3 id="verdictWinner"></h3></div></div><p id="verdictReason" class="reason"></p><div id="verdictOptions" class="compare-grid"></div><button id="shareBtn" class="primary wide">Share & let friends vote</button><button id="creatorVoteBtn" class="secondary wide">Preview voting page</button></div></section>
   <section id="voteView" class="view"><div class="panel center"><span class="eyebrow">YOUR VOTE</span><h2 id="voteQuestion"></h2><p>Which one would you choose?</p><div id="voteOptions" class="compare-grid"></div><div id="voteConfirmation" class="success hidden">Vote counted. Thanks for breaking the tie.</div><button class="secondary wide" data-go="resultsView">See results</button></div></section>
   <section id="resultsView" class="view"><div class="panel center"><span class="eyebrow">RESULTS</span><h2 id="resultsQuestion"></h2><div class="winner"><span id="resultsWinner">—</span><div><small>Leading choice</small><h3 id="resultsWinnerName">No votes yet</h3></div></div><div class="stats"><div><span id="aiPickResult">—</span><small>Tiebreak pick</small></div><div><span id="peoplePickResult">—</span><small>People pick</small></div><div><span id="totalVotes">0</span><small>Votes</small></div></div><div class="bar"><div id="barA"></div><div id="barB"></div></div><div class="pct-row"><span>A · <b id="pctA">0%</b></span><span>B · <b id="pctB">0%</b></span></div><button id="resetBtn" class="primary wide">Create another Tiebreak</button></div></section>
-</main><div id="toast" class="toast"></div><script src="app.js"></script><script src="link-preview.js"></script></body></html>
+</main>
+
+<div id="photoEditor" class="editor-overlay hidden">
+  <div class="editor-modal">
+    <div class="editor-head"><div><span class="eyebrow">PHOTO EDITOR</span><h3 id="editorHeading">Edit photo</h3></div><button id="closeEditor" class="secondary small">✕</button></div>
+    <div class="editor-frame"><img id="editorPreview" alt="Photo editor preview"></div>
+    <label>Zoom <input id="editZoom" type="range" min="0.25" max="3" step="0.05" value="1"></label>
+    <label>Move left / right <input id="editX" type="range" min="-50" max="50" step="1" value="0"></label>
+    <label>Move up / down <input id="editY" type="range" min="-50" max="50" step="1" value="0"></label>
+    <div class="control-row"><button id="editRotate" class="secondary">Rotate</button><button id="editReset" class="secondary">Fit / Reset</button></div>
+    <button id="applyEdit" class="primary wide">Done</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script><script src="link-preview.js"></script>
+</body></html>
