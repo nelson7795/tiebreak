@@ -14,15 +14,7 @@ async function fetchLinkPreview(k){
     if(d.title&&(name.value.trim()===`Option ${k}`||!name.value.trim())){name.value=d.title;o.name=d.title}
     const price=$(`option${k}Price`);
     if(d.price&&!price.value.trim()){price.value=(d.currency==='USD'&&!String(d.price).startsWith('$')?'$':'')+d.price;o.price=price.value}
-    if(d.image&&!o.file){
-      o.image=d.image;o.edit={zoom:1,x:0,y:0,rotation:0};
-      const im=$(`preview${k}`);
-      im.onload=()=>autoFrame(k,im);
-      im.src=d.image;
-      im.classList.remove('hidden');
-      document.querySelector(`[data-upload="${k}"]`).classList.add('hidden');
-      $(`edit${k}`).classList.remove('hidden');
-    }
+    if(d.image&&!o.file){o.link=u;revealImage(k,d.image)}
     toast(d.image?`Option ${k} details & photo added`:`Option ${k} details added — no photo available`);
   }catch(e){console.error(e);o._previewUrl='';toast(`Couldn’t auto-fill Option ${k}; manual upload still works`)}
 }
