@@ -1,9 +1,8 @@
 // Affiliate routing layer for Tiebreak.
-// Tracking is intentionally OFF until approved merchant IDs are added.
-// When a merchant is enabled, outboundUrl(rawUrl) can apply approved tracking.
+// Merchant tracking is enabled only after the corresponding affiliate account is set up.
 
 const AFFILIATE_CONFIG = Object.freeze({
-  amazon: { enabled:false, tag:'' },
+  amazon: { enabled:true, tag:'tiebreak01-20' },
   target: { enabled:false, trackingUrl:'' },
   walmart: { enabled:false, trackingUrl:'' },
   expedia: { enabled:false, trackingUrl:'' },
@@ -35,10 +34,7 @@ function addAmazonTag(rawUrl,tag){
 
 function wrapTrackingUrl(template,rawUrl){
   if(!template)return rawUrl;
-  // Merchant-provided tracking URL templates should contain {url}.
-  return template.includes('{url}')
-    ? template.replace('{url}',encodeURIComponent(rawUrl))
-    : rawUrl;
+  return template.includes('{url}')?template.replace('{url}',encodeURIComponent(rawUrl)):rawUrl;
 }
 
 function outboundUrl(rawUrl){
@@ -47,7 +43,6 @@ function outboundUrl(rawUrl){
   const merchant=merchantFor(safe);
   const cfg=AFFILIATE_CONFIG[merchant];
   if(!cfg||!cfg.enabled)return safe;
-
   switch(merchant){
     case'amazon': return addAmazonTag(safe,cfg.tag);
     case'target':
