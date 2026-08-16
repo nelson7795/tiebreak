@@ -9,6 +9,7 @@ Tiebreak is a mobile-friendly decision app where a creator compares Option A vs 
 - Public share links
 - Anonymous voting
 - Persistent results
+- Edited photos are baked before sharing so voters see the creator's exact crop and orientation
 
 ## Stack
 Static HTML/CSS/JavaScript + Supabase + Vercel.
