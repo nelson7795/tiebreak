@@ -3,28 +3,28 @@ const $=id=>document.getElementById(id);
 const state={question:'Which should I choose?',context:'',options:{A:{name:'Option A',image:null,file:null,link:'',price:'',edit:{zoom:1,x:0,y:0,rotation:0}},B:{name:'Option B',image:null,file:null,link:'',price:'',edit:{zoom:1,x:0,y:0,rotation:0}}},votes:{A:0,B:0},shareToken:null,aiPick:null};
 function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(id==='resultsView')results();scrollTo(0,0)}
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
-function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]))}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function safeUrl(s){try{const u=new URL(s);return /^https?:$/.test(u.protocol)?u.href:''}catch{return''}}
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function transform(k){const e=state.options[k].edit;return `translate(${e.x}%,${e.y}%) scale(${e.zoom}) rotate(${e.rotation}deg)`}
-function paint(k){$(`preview${k}`).style.transform=transform(k)}
-function autoFrame(k,img){
-  if(!img)return;
-  state.options[k].edit={zoom:1,x:0,y:0,rotation:0};
-  $(`zoom${k}`).value=1;
-  $(`x${k}`).value=0;
-  $(`y${k}`).value=0;
-  paint(k);
-}
+function paint(k){const im=$(`preview${k}`);if(im)im.style.transform=transform(k)}
+function autoFrame(k){state.options[k].edit={zoom:1,x:0,y:0,rotation:0};paint(k)}
+function revealImage(k,src){const o=state.options[k];o.image=src;const im=$(`preview${k}`);im.onload=()=>autoFrame(k);im.src=src;im.classList.remove('hidden');$(`sourceActions${k}`).classList.add('source-actions-over-image');$(`edit${k}`).classList.remove('hidden')}
 for(const k of ['A','B']){
   document.querySelector(`[data-upload="${k}"]`).onclick=()=>$( `file${k}`).click();
-  $(`file${k}`).onchange=e=>{const f=e.target.files[0];if(!f)return;state.options[k].file=f;state.options[k].image=URL.createObjectURL(f);state.options[k].edit={zoom:1,x:0,y:0,rotation:0};const im=$(`preview${k}`);im.onload=()=>autoFrame(k,im);im.src=state.options[k].image;im.classList.remove('hidden');document.querySelector(`[data-upload="${k}"]`).classList.add('hidden');$(`edit${k}`).classList.remove('hidden')};
-  $(`zoom${k}`).oninput=e=>{state.options[k].edit.zoom=+e.target.value;paint(k)};
-  $(`x${k}`).oninput=e=>{state.options[k].edit.x=+e.target.value;paint(k)};
-  $(`y${k}`).oninput=e=>{state.options[k].edit.y=+e.target.value;paint(k)};
-  document.querySelector(`[data-rotate="${k}"]`).onclick=()=>{state.options[k].edit.rotation=(state.options[k].edit.rotation+90)%360;paint(k)};
-  document.querySelector(`[data-fit="${k}"]`).onclick=()=>{state.options[k].edit={zoom:1,x:0,y:0,rotation:0};$(`zoom${k}`).value=1;$(`x${k}`).value=0;$(`y${k}`).value=0;paint(k)};
+  $(`file${k}`).onchange=e=>{const f=e.target.files[0];if(!f)return;state.options[k].file=f;revealImage(k,URL.createObjectURL(f))};
 }
+let editingKey=null;
+function editorPaint(){if(!editingKey)return;const r=state.options[editingKey].edit;$('editorPreview').style.transform=`translate(${r.x}%,${r.y}%) scale(${r.zoom}) rotate(${r.rotation}deg)`}
+function openEditor(k){const o=state.options[k];if(!o.image)return;editingKey=k;$('editorHeading').textContent=`Edit Option ${k}`;$('editorPreview').src=o.image;$('editZoom').value=o.edit.zoom;$('editX').value=o.edit.x;$('editY').value=o.edit.y;$('photoEditor').classList.remove('hidden');editorPaint()}
+document.querySelectorAll('[data-edit-photo]').forEach(b=>b.onclick=()=>openEditor(b.dataset.editPhoto));
+$('editZoom').oninput=e=>{state.options[editingKey].edit.zoom=+e.target.value;editorPaint()};
+$('editX').oninput=e=>{state.options[editingKey].edit.x=+e.target.value;editorPaint()};
+$('editY').oninput=e=>{state.options[editingKey].edit.y=+e.target.value;editorPaint()};
+$('editRotate').onclick=()=>{state.options[editingKey].edit.rotation=(state.options[editingKey].edit.rotation+90)%360;editorPaint()};
+$('editReset').onclick=()=>{state.options[editingKey].edit={zoom:1,x:0,y:0,rotation:0};$('editZoom').value=1;$('editX').value=0;$('editY').value=0;editorPaint()};
+$('applyEdit').onclick=()=>{paint(editingKey);$('photoEditor').classList.add('hidden');editingKey=null};
+$('closeEditor').onclick=()=>{$('photoEditor').classList.add('hidden');if(editingKey)paint(editingKey);editingKey=null};
 function sync(){state.question=$('questionInput').value.trim()||'Which should I choose?';state.context=$('contextInput').value.trim();for(const k of ['A','B']){state.options[k].name=$(`option${k}Name`).value.trim()||`Option ${k}`;state.options[k].link=$(`option${k}Link`).value.trim();state.options[k].price=$(`option${k}Price`).value.trim()}}
 function card(k,vote=false){const o=state.options[k],im=o.image?`<div class="option-image"><img src="${o.image}" style="transform:${transform(k)}"></div>`:`<div class="option-image">No photo</div>`,ln=safeUrl(o.link)?`<a class="product-link" target="_blank" rel="noopener" href="${safeUrl(o.link)}">View item ↗</a>`:'';return `<div class="${vote?'vote-card':'compare-card'}"><div class="option-badge">${k}</div>${im}<h3>${esc(o.name)}</h3>${o.price?`<div class="price-line">${esc(o.price)}</div>`:''}${ln}${vote?`<button class="primary wide vote-btn" data-vote="${k}">Vote ${k}</button>`:''}</div>`}
 function choose(){const A=state.options.A,B=state.options.B;let a=0,b=0;if(A.price&&B.price){const pa=parseFloat(A.price.replace(/[^0-9.]/g,'')),pb=parseFloat(B.price.replace(/[^0-9.]/g,''));if(pa<pb)a++;if(pb<pa)b++}state.aiPick=a===b?(Math.random()<.5?'A':'B'):(a>b?'A':'B');return state.aiPick}
