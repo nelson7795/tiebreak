@@ -3,21 +3,17 @@ const $=id=>document.getElementById(id);
 const state={question:'Which should I choose?',context:'',options:{A:{name:'Option A',image:null,file:null,link:'',price:'',edit:{zoom:1,x:0,y:0,rotation:0}},B:{name:'Option B',image:null,file:null,link:'',price:'',edit:{zoom:1,x:0,y:0,rotation:0}}},votes:{A:0,B:0},shareToken:null,aiPick:null};
 function show(id){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));$(id).classList.add('active');if(id==='resultsView')results();scrollTo(0,0)}
 document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
-function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function esc(s=''){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#39;'}[m]))}
 function safeUrl(s){try{const u=new URL(s);return /^https?:$/.test(u.protocol)?u.href:''}catch{return''}}
 function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2400)}
 function transform(k){const e=state.options[k].edit;return `translate(${e.x}%,${e.y}%) scale(${e.zoom}) rotate(${e.rotation}deg)`}
 function paint(k){$(`preview${k}`).style.transform=transform(k)}
 function autoFrame(k,img){
-  const box=$(`upload${k}`);
-  if(!img?.naturalWidth||!img?.naturalHeight||!box)return;
-  const frameRatio=(box.clientWidth||16)/(box.clientHeight||9);
-  const imageRatio=img.naturalWidth/img.naturalHeight;
-  let zoom=imageRatio>frameRatio?imageRatio/frameRatio:frameRatio/imageRatio;
-  zoom=Math.max(1,Math.min(zoom,3));
-  state.options[k].edit={zoom:+zoom.toFixed(2),x:0,y:0,rotation:0};
-  $(`zoom${k}`).value=state.options[k].edit.zoom;
-  $(`x${k}`).value=0;$(`y${k}`).value=0;
+  if(!img)return;
+  state.options[k].edit={zoom:1,x:0,y:0,rotation:0};
+  $(`zoom${k}`).value=1;
+  $(`x${k}`).value=0;
+  $(`y${k}`).value=0;
   paint(k);
 }
 for(const k of ['A','B']){
