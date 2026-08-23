@@ -23,16 +23,17 @@ async function fetchLinkPreview(k){
 }
 for(const k of ['A','B']){let timer;const field=$(`option${k}Link`);field.addEventListener('paste',()=>{clearTimeout(timer);timer=setTimeout(()=>fetchLinkPreview(k),180)});field.addEventListener('blur',()=>fetchLinkPreview(k))}
 
-// Facebook should share the actual voting page, not the PNG as a photo.
-// That keeps the Facebook preview clickable and routes people straight to voting.
+// Facebook needs the actual Tiebreak URL as the shared object so the post stays
+// clickable. Sharing only the generated PNG creates a photo post whose CTA is
+// just pixels. The /d/:token page already contains dynamic Open Graph metadata
+// and the A/B preview image, so Facebook can render the card and link it to voting.
 const facebookShareButton=document.getElementById('shareFacebook');
 if(facebookShareButton){
-  facebookShareButton.onclick=async()=>{
+  facebookShareButton.onclick=()=>{
     if(!state.shareToken){toast('Publish this Tiebreak first');return}
-    const voteUrl=`https://mytiebreak.com/d/${state.shareToken}`;
-    try{await navigator.clipboard.writeText(voteUrl)}catch{}
+    const voteUrl=shareUrl();
     const facebookUrl=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(voteUrl)}`;
-    toast('Opening Facebook — the post will link directly to voting');
-    window.location.assign(facebookUrl);
+    toast('Opening Facebook — the Tiebreak card will link directly to voting');
+    window.location.href=facebookUrl;
   };
 }
