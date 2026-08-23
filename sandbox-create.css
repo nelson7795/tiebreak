@@ -1,0 +1,39 @@
+/* Sandbox-only creator input polish */
+#createView .panel.create-panel{max-width:760px;padding:22px 22px 26px}
+#createView .eyebrow{font-size:.78rem;font-weight:900;letter-spacing:.09em}
+#createView h2{margin:7px 0 14px;font-size:clamp(2rem,5.6vw,3rem);line-height:1;letter-spacing:-.04em}
+#createView label{font-size:.84rem;margin:8px 0 5px;color:#d9dbea}
+#createView .create-question-row{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;align-items:end}
+#createView #questionInput{font-size:1rem;font-weight:750;padding:12px 13px;min-height:46px}
+#createView #contextInput{min-height:46px;height:46px;resize:vertical;padding:12px 13px}
+#createView .options-grid.create-options{grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
+#createView .option-editor{padding:12px;border-radius:18px;background:linear-gradient(180deg,#111728,#0e1421);border:1px solid #333b56}
+#createView .option-head{display:grid;grid-template-columns:36px 1fr;gap:8px;align-items:center;margin-bottom:9px}
+#createView .option-head .option-badge{position:static!important;width:36px;height:36px;margin:0;border-radius:10px}
+#createView .option-head input[id$="Name"]{padding:10px 12px!important;min-height:44px!important;font-weight:800}
+#createView .source-box{aspect-ratio:auto;min-height:0;margin:0 0 9px;background:#0b0f19;border:1px solid #343d59;border-radius:14px;overflow:visible}
+#createView .source-actions{position:static!important;width:100%;padding:10px!important;background:transparent!important;display:grid!important;grid-template-columns:1fr auto;grid-template-areas:"link link" "upload or";gap:7px!important;align-items:center}
+#createView .source-actions input[type="url"]{grid-area:link;order:0!important;max-width:none!important;width:100%;min-height:44px;border:1px solid #48516e;background:#111729;font-size:.9rem;padding:11px 12px}
+#createView .source-actions input[type="url"]::placeholder{color:#8e95aa}
+#createView .source-actions .upload-cta{grid-area:upload;order:0!important;background:#20263a;border:1px solid #46506b;color:#f2f2f7;padding:9px 11px;border-radius:11px;width:auto;font-size:.82rem;font-weight:800}
+#createView .source-actions .or-label{grid-area:or;order:0!important;font-size:.7rem;text-transform:none;letter-spacing:0;color:#747d96;white-space:nowrap}
+#createView .option-editor>input[id$="Price"]{min-height:42px;font-size:.85rem;padding:10px 11px;background:#0c111d}
+#createView #decideBtn{position:static!important;bottom:auto!important;z-index:auto!important;min-height:56px;border-radius:16px;font-size:1.05rem;box-shadow:none!important;margin:14px 0 0!important}
+
+@media(max-width:650px){
+  #createView .panel.create-panel{margin:8px 10px 18px;padding:16px 12px 20px;border-radius:21px}
+  #createView h2{font-size:2.1rem;margin-bottom:10px}
+  #createView .create-question-row{grid-template-columns:1fr;gap:4px}
+  #createView #questionInput{min-height:44px;font-size:.96rem}
+  #createView #contextInput{min-height:42px;height:42px;font-size:.9rem}
+  #createView .options-grid.create-options{grid-template-columns:1fr;gap:10px;margin:11px 0}
+  #createView .option-editor{padding:10px;border-radius:16px}
+  #createView .option-head{grid-template-columns:34px 1fr;gap:7px;margin-bottom:7px}
+  #createView .option-head .option-badge{width:34px;height:34px}
+  #createView .option-head input[id$="Name"]{min-height:42px!important;font-size:.95rem}
+  #createView .source-actions{padding:8px!important;gap:6px!important}
+  #createView .source-actions input[type="url"]{min-height:42px;font-size:.86rem}
+  #createView .source-actions .upload-cta{font-size:.78rem;padding:8px 10px}
+  #createView .option-editor>input[id$="Price"]{min-height:40px}
+  #createView #decideBtn{min-height:54px;margin-top:12px!important}
+}
