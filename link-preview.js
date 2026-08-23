@@ -23,16 +23,22 @@ async function fetchLinkPreview(k){
 }
 for(const k of ['A','B']){let timer;const field=$(`option${k}Link`);field.addEventListener('paste',()=>{clearTimeout(timer);timer=setTimeout(()=>fetchLinkPreview(k),180)});field.addEventListener('blur',()=>fetchLinkPreview(k))}
 
-// Facebook should share the actual voting page, not the PNG as a photo.
-// That keeps the Facebook preview clickable and routes people straight to voting.
+// Share only the Tiebreak URL through the native share sheet so iOS/Facebook
+// treats it as a clickable link attachment instead of putting the raw URL into
+// the visible post copy. Fall back to Facebook's web sharer when needed.
 const facebookShareButton=document.getElementById('shareFacebook');
 if(facebookShareButton){
   facebookShareButton.onclick=async()=>{
     if(!state.shareToken){toast('Publish this Tiebreak first');return}
     const voteUrl=`https://mytiebreak.com/d/${state.shareToken}`;
-    try{await navigator.clipboard.writeText(voteUrl)}catch{}
+    if(navigator.share){
+      try{
+        toast('Choose Facebook — the Tiebreak card will stay clickable');
+        await navigator.share({url:voteUrl});
+        return;
+      }catch(e){if(e?.name==='AbortError')return}
+    }
     const facebookUrl=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(voteUrl)}`;
-    toast('Opening Facebook — the post will link directly to voting');
     window.location.assign(facebookUrl);
   };
 }
