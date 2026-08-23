@@ -129,6 +129,53 @@ results=async function(){
   if(pctB)pctB.textContent=b+'%';
 };
 
+// Voting-page redesign: make the friend's decision the dominant action.
+const voteView=document.getElementById('voteView');
+if(voteView){
+  voteView.classList.add('sandbox-vote-view');
+  const eyebrow=voteView.querySelector('.eyebrow');
+  if(eyebrow)eyebrow.textContent='HELP BREAK THE TIE';
+  const intro=voteView.querySelector('.panel.center > p');
+  if(intro)intro.textContent='Tap the one you’d choose.';
+  const resultsButton=voteView.querySelector('[data-go="resultsView"]');
+  if(resultsButton)resultsButton.textContent='See current results';
+}
+
+const sandboxBaseVotePage=votePage;
+votePage=function(){
+  sandboxBaseVotePage();
+  const cards=[...document.querySelectorAll('#voteOptions .vote-card')];
+  cards.forEach(cardEl=>{
+    const btn=cardEl.querySelector('.vote-btn');
+    const key=btn?.dataset.vote;
+    if(!btn||!key)return;
+    btn.textContent=`Vote ${key}`;
+    cardEl.setAttribute('role','group');
+    cardEl.setAttribute('aria-label',`Option ${key}: ${shortTitle(state.options[key].name)}`);
+  });
+};
+
+const sandboxBaseSetVoteState=setVoteState;
+setVoteState=function(k){
+  sandboxBaseSetVoteState(k);
+  const confirmation=document.getElementById('voteConfirmation');
+  document.querySelectorAll('#voteOptions .vote-card').forEach(cardEl=>{
+    const key=cardEl.querySelector('.vote-btn')?.dataset.vote;
+    cardEl.classList.toggle('voted-choice',!!k&&key===k);
+    cardEl.classList.toggle('not-voted-choice',!!k&&key!==k);
+  });
+  if(k&&confirmation){
+    confirmation.innerHTML=`<strong>Vote counted!</strong><span>You picked ${k} · ${esc(shortTitle(state.options[k].name))}</span>`;
+  }
+};
+
+const sandboxBaseCast=cast;
+cast=async function(k){
+  await sandboxBaseCast(k);
+  const confirmation=document.getElementById('voteConfirmation');
+  if(confirmation&&!confirmation.classList.contains('hidden'))confirmation.scrollIntoView({behavior:'smooth',block:'center'});
+};
+
 const polish=document.createElement('style');
 polish.textContent=`
 #verdictView .ai-letter-hidden{display:none!important}
@@ -153,7 +200,55 @@ polish.textContent=`
 #resultsView .results-stats small{display:block;margin-top:4px;font-size:.78rem;color:#aeb2c5}
 #resultsView .bar{margin-top:8px}
 #resultsView .pct-row{margin-bottom:28px}
-@media(max-width:650px){#shareHub .share-modal{padding:18px}#resultsView .results-winner{padding:16px;gap:12px}#resultsView .results-winner>span{min-width:56px;height:56px;font-size:1.7rem}#resultsView .results-stats{gap:7px}#resultsView .results-stats>div{padding:12px 5px}}
+
+/* Friend voting experience */
+#voteView .panel{max-width:820px;padding-top:28px}
+#voteView .eyebrow{display:inline-flex;padding:7px 12px;border-radius:999px;background:#282344;color:#c4b5fd;font-weight:900;letter-spacing:.08em}
+#voteView #voteQuestion{font-size:clamp(2rem,7vw,3.6rem);line-height:1.02;max-width:700px;margin:18px auto 10px;letter-spacing:-.035em}
+#voteView .panel.center>p{font-size:1.08rem;color:#b7bbcd;margin:0 auto 24px}
+#voteView #voteOptions{gap:14px;align-items:stretch}
+#voteView .vote-card{position:relative;display:flex;flex-direction:column;padding:14px;border:1px solid #343b57;border-radius:24px;background:#0f1524;overflow:hidden;transition:transform .18s ease,border-color .18s ease,opacity .18s ease,box-shadow .18s ease}
+#voteView .vote-card:hover{transform:translateY(-2px);border-color:#6558a7}
+#voteView .vote-card-labels{position:absolute;z-index:2;left:24px;right:24px;top:24px;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+#voteView .vote-card>.option-badge{position:absolute;z-index:2;left:24px;top:24px}
+#voteView .vote-card-labels .option-badge{position:static}
+#voteView .ai-pick-badge{padding:7px 9px;border-radius:999px;background:#c4b5fd;color:#171329;font-size:.66rem;font-weight:950;letter-spacing:.06em;box-shadow:0 3px 14px rgba(0,0,0,.18)}
+#voteView .option-image{height:clamp(210px,38vw,330px);border-radius:16px;background:#fff;overflow:hidden;margin:0 0 14px}
+#voteView .option-image img{width:100%;height:100%;object-fit:contain}
+#voteView .vote-card h3{font-size:clamp(1.08rem,3.4vw,1.4rem);line-height:1.15;margin:4px 6px 12px;min-height:2.3em}
+#voteView .vote-card .product-link{margin:0 6px 14px;color:#b9b5d9;font-size:.9rem}
+#voteView .vote-btn{margin-top:auto;min-height:58px;border-radius:16px;font-size:1.1rem;font-weight:950;background:linear-gradient(135deg,#7c4dff,#d946ef);box-shadow:0 8px 24px rgba(139,92,246,.2)}
+#voteView .vote-btn:disabled{opacity:.62}
+#voteView .voted-choice{border-color:#a78bfa;box-shadow:0 0 0 2px rgba(167,139,250,.22),0 16px 35px rgba(0,0,0,.2)}
+#voteView .voted-choice .vote-btn{opacity:1;background:linear-gradient(135deg,#7c4dff,#d946ef)}
+#voteView .voted-choice .vote-btn::before{content:'✓ ';font-weight:1000}
+#voteView .not-voted-choice{opacity:.58}
+#voteView #voteConfirmation{display:flex;flex-direction:column;gap:4px;margin:18px auto 12px;padding:16px 18px;max-width:650px;border:1px solid #5d4f98;border-radius:18px;background:#17152b;color:#fff}
+#voteView #voteConfirmation strong{font-size:1.08rem}
+#voteView #voteConfirmation span{color:#bbb8cf;font-size:.9rem}
+#voteView #voteConfirmation.hidden{display:none}
+#voteView #changeVoteBtn,#voteView [data-go="resultsView"],#voteView #voteShareBtn,#voteView #makeOwnBtn{max-width:650px;margin-left:auto;margin-right:auto}
+#voteView [data-go="resultsView"]{margin-top:10px}
+#voteView #voteShareBtn{margin-top:10px}
+#voteView #makeOwnBtn{margin-top:10px}
+@media(max-width:650px){
+  #shareHub .share-modal{padding:18px}
+  #resultsView .results-winner{padding:16px;gap:12px}
+  #resultsView .results-winner>span{min-width:56px;height:56px;font-size:1.7rem}
+  #resultsView .results-stats{gap:7px}
+  #resultsView .results-stats>div{padding:12px 5px}
+  #voteView .panel{padding:24px 14px}
+  #voteView #voteQuestion{margin-top:14px}
+  #voteView #voteOptions{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #voteView .vote-card{padding:8px;border-radius:18px}
+  #voteView .option-image{height:46vw;max-height:250px;border-radius:12px;margin-bottom:10px}
+  #voteView .vote-card>.option-badge,#voteView .vote-card-labels{left:14px;right:14px;top:14px}
+  #voteView .option-badge{width:38px;height:38px;font-size:1.05rem}
+  #voteView .ai-pick-badge{padding:5px 7px;font-size:.55rem}
+  #voteView .vote-card h3{font-size:.96rem;margin:3px 3px 9px;min-height:2.3em}
+  #voteView .vote-card .product-link{font-size:.78rem;margin:0 3px 9px}
+  #voteView .vote-btn{min-height:52px;border-radius:13px;font-size:1rem}
+}
 `;
 document.head.appendChild(polish);
 
