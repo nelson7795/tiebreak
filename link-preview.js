@@ -23,17 +23,25 @@ async function fetchLinkPreview(k){
 }
 for(const k of ['A','B']){let timer;const field=$(`option${k}Link`);field.addEventListener('paste',()=>{clearTimeout(timer);timer=setTimeout(()=>fetchLinkPreview(k),180)});field.addEventListener('blur',()=>fetchLinkPreview(k))}
 
-// Facebook needs the actual Tiebreak URL as the shared object so the post stays
-// clickable. Sharing only the generated PNG creates a photo post whose CTA is
-// just pixels. The /d/:token page already contains dynamic Open Graph metadata
-// and the A/B preview image, so Facebook can render the card and link it to voting.
+// Use the device's native share sheet first so the user can choose Facebook,
+// Messages, Mail, etc. The voting URL is included in the share payload so the
+// recipient gets a clickable Tiebreak link. Fall back to Facebook's web sharer.
 const facebookShareButton=document.getElementById('shareFacebook');
 if(facebookShareButton){
-  facebookShareButton.onclick=()=>{
+  facebookShareButton.onclick=async()=>{
     if(!state.shareToken){toast('Publish this Tiebreak first');return}
-    const voteUrl=shareUrl();
+    const voteUrl=`https://mytiebreak.com/d/${state.shareToken}`;
+    const shareData={title:'Help me decide',text:'Which should I choose?',url:voteUrl};
+    if(navigator.share){
+      try{
+        await navigator.share(shareData);
+        return;
+      }catch(e){
+        if(e?.name==='AbortError')return;
+        console.warn('Native share failed, falling back to Facebook sharer',e);
+      }
+    }
     const facebookUrl=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(voteUrl)}`;
-    toast('Opening Facebook — the Tiebreak card will link directly to voting');
-    window.location.href=facebookUrl;
+    window.location.assign(facebookUrl);
   };
 }
