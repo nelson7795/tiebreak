@@ -22,18 +22,18 @@ export default async function handler(req,res){
   const lines=wrap(d?.question,38),q1=esc(lines[0]||'Which should I choose?'),q2=esc(lines[1]||'');
   const base=Buffer.from(`<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
     <rect width="1200" height="630" fill="#0b0d17"/>
-    <text x="60" y="62" fill="#c4b5fd" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="700" letter-spacing="2">TIEBREAK</text>
-    <text x="60" y="120" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">${q1}</text>
-    ${q2?`<text x="60" y="166" fill="#ffffff" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">${q2}</text>`:''}
+    <text x="60" y="62" fill="#c4b5fd" font-family="sans-serif" font-size="26" font-weight="700" letter-spacing="2">TIEBREAK</text>
+    <text x="60" y="120" fill="#ffffff" font-family="sans-serif" font-size="42" font-weight="700">${q1}</text>
+    ${q2?`<text x="60" y="166" fill="#ffffff" font-family="sans-serif" font-size="42" font-weight="700">${q2}</text>`:''}
     <rect x="70" y="220" width="500" height="315" rx="22" fill="#fff"/>
     <rect x="630" y="220" width="500" height="315" rx="22" fill="#fff"/>
   </svg>`);
   const photos=await sharp(base).composite(composites).png().toBuffer();
   const overlay=Buffer.from(`<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="110" cy="260" r="30" fill="#8b5cf6"/><text x="110" y="270" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">A</text>
-    <circle cx="670" cy="260" r="30" fill="#8b5cf6"/><text x="670" y="270" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">B</text>
+    <circle cx="110" cy="260" r="30" fill="#8b5cf6"/><text x="110" y="270" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="28" font-weight="700">A</text>
+    <circle cx="670" cy="260" r="30" fill="#8b5cf6"/><text x="670" y="270" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="28" font-weight="700">B</text>
     <rect x="390" y="555" width="420" height="56" rx="28" fill="#8b5cf6"/>
-    <text x="600" y="591" text-anchor="middle" fill="#fff" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="1">VOTE ON TIEBREAK</text>
+    <text x="600" y="591" text-anchor="middle" fill="#fff" font-family="sans-serif" font-size="22" font-weight="700" letter-spacing="1">VOTE ON TIEBREAK</text>
   </svg>`);
   const out=await sharp(photos).composite([{input:overlay,left:0,top:0}]).png().toBuffer();
   res.setHeader('Content-Type','image/png');res.setHeader('Cache-Control','no-store, max-age=0');res.status(200).send(out);
