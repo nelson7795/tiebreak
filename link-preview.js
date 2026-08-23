@@ -23,22 +23,16 @@ async function fetchLinkPreview(k){
 }
 for(const k of ['A','B']){let timer;const field=$(`option${k}Link`);field.addEventListener('paste',()=>{clearTimeout(timer);timer=setTimeout(()=>fetchLinkPreview(k),180)});field.addEventListener('blur',()=>fetchLinkPreview(k))}
 
-// Share only the Tiebreak URL through the native share sheet so iOS/Facebook
-// treats it as a clickable link attachment instead of putting the raw URL into
-// the visible post copy. Fall back to Facebook's web sharer when needed.
+// Facebook's web sharer reliably scrapes the /d/:token Open Graph metadata and
+// renders the full clickable Tiebreak preview. Do not copy or prefill the URL as
+// post text; the link is carried only as the shared attachment.
 const facebookShareButton=document.getElementById('shareFacebook');
 if(facebookShareButton){
-  facebookShareButton.onclick=async()=>{
+  facebookShareButton.onclick=()=>{
     if(!state.shareToken){toast('Publish this Tiebreak first');return}
     const voteUrl=`https://mytiebreak.com/d/${state.shareToken}`;
-    if(navigator.share){
-      try{
-        toast('Choose Facebook — the Tiebreak card will stay clickable');
-        await navigator.share({url:voteUrl});
-        return;
-      }catch(e){if(e?.name==='AbortError')return}
-    }
     const facebookUrl=`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(voteUrl)}`;
+    toast('Opening Facebook with a clickable Tiebreak preview');
     window.location.assign(facebookUrl);
   };
 }
