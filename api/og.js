@@ -26,13 +26,11 @@ export default async function handler(req,res){
  try{
   const token=String(req.query.token||'');const d=await getTie(token);const opts=d?.options||[];const A=opts.find(o=>o.option_key==='A')||{};const B=opts.find(o=>o.option_key==='B')||{};
   const [ab,bb]=await Promise.all([img(A.image_url),img(B.image_url)]);const composites=[];
-  if(ab){const p=await sharp(ab).resize(500,315,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:70,top:220})}
-  if(bb){const p=await sharp(bb).resize(500,315,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:630,top:220})}
+  if(ab){const p=await sharp(ab).resize(500,360,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:70,top:205})}
+  if(bb){const p=await sharp(bb).resize(500,360,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:630,top:205})}
   const lines=wrap(d?.question,31);const q1=lines[0]||'Which should I choose?';const q2=lines[1]||'';
-  const base=Buffer.from(`<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="630" fill="#0b0d17"/>${vtext('TIEBREAK',60,42,24,'#c4b5fd')}${vtext(q1,60,92,36,'#ffffff')}${q2?vtext(q2,60,137,36,'#ffffff'):''}<rect x="70" y="220" width="500" height="315" rx="22" fill="#fff"/><rect x="630" y="220" width="500" height="315" rx="22" fill="#fff"/></svg>`);
-  const photos=await sharp(base).composite(composites).png().toBuffer();
-  const overlay=Buffer.from(`<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg"><circle cx="110" cy="260" r="30" fill="#8b5cf6"/>${vtext('A',110,246,28,'#fff',true)}<circle cx="670" cy="260" r="30" fill="#8b5cf6"/>${vtext('B',670,246,28,'#fff',true)}<rect x="390" y="555" width="420" height="56" rx="28" fill="#8b5cf6"/>${vtext('VOTE ON TIEBREAK',600,571,22,'#fff',true)}</svg>`);
-  const out=await sharp(photos).composite([{input:overlay,left:0,top:0}]).png().toBuffer();
+  const base=Buffer.from(`<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg"><rect width="1200" height="630" fill="#0b0d17"/>${vtext('TIEBREAK',60,42,24,'#c4b5fd')}${vtext(q1,60,92,36,'#ffffff')}${q2?vtext(q2,60,137,36,'#ffffff'):''}<rect x="70" y="205" width="500" height="360" rx="22" fill="#fff"/><rect x="630" y="205" width="500" height="360" rx="22" fill="#fff"/></svg>`);
+  const out=await sharp(base).composite(composites).png().toBuffer();
   res.setHeader('Content-Type','image/png');res.setHeader('Cache-Control','no-store, max-age=0');res.status(200).send(out);
  }catch(e){console.error(e);res.status(404).end()}
 }
