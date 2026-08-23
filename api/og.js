@@ -33,7 +33,6 @@ export default async function handler(req,res){
     <rect width="1200" height="630" fill="#0b0d17"/>
     <rect x="70" y="150" width="500" height="315" rx="22" fill="#fff"/>
     <rect x="630" y="150" width="500" height="315" rx="22" fill="#fff"/>
-    <rect x="390" y="515" width="420" height="56" rx="28" fill="#8b5cf6"/>
   </svg>`);
 
   const out=await sharp(base).composite(composites).png().toBuffer();
