@@ -25,6 +25,10 @@ shortTitle = function(s=''){
   else if(/\bsandals?\b/i.test(t)) type='Sandals';
   else if(/\bshoes?\b/i.test(t)) type='Shoes';
   else if(/\bhandbags?\b|\bpurses?\b|\bbags?\b/i.test(t)) type='Bag';
+
+  // Known retailer titles sometimes omit the product type from the scraped title.
+  if(brand==='Free People' && !type && /diamonds are/i.test(t)) type='Western Boots';
+  if(brand==='DREAM PAIRS' && !type) type='Western Boots';
   if(brand&&type)return `${brand} ${type}`;
 
   t=t.replace(/\s*[|,]\s*(size|color|theme|party|country|concert).*$/i,'').replace(/\b(size|color)\s*[:#]?\s*[\w.-]+.*$/i,'').trim();
