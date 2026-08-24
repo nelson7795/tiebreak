@@ -1,8 +1,12 @@
-// Instagram-specific sharing: use a 9:16 card so Instagram does not crop the landscape OG image.
+// Instagram-specific sharing: use a 9:16 card and include the clickable voting URL.
 (function(){
   function instagramImageUrl(){
     const base=typeof shareImageUrl==='function'?shareImageUrl():'';
     return base?`${base}&format=story`:'';
+  }
+
+  function votingUrl(){
+    return typeof shareUrl==='function'?shareUrl():'';
   }
 
   async function instagramCardFile(){
@@ -17,9 +21,24 @@
   async function shareInstagramCard(){
     try{
       const file=await instagramCardFile();
-      const data={files:[file]};
+      const url=votingUrl();
+      const data={
+        files:[file],
+        title:'Tiebreak — Help me decide',
+        text:url?`Help me decide — vote here: ${url}`:'Help me decide on Tiebreak',
+        ...(url?{url}:{})
+      };
+
       if(navigator.share&&(!navigator.canShare||navigator.canShare(data))){
         await navigator.share(data);
+        return true;
+      }
+
+      // Some iOS share targets reject files + URL together. Fall back to the
+      // image-only share while the voting URL remains copied to the clipboard.
+      const imageOnly={files:[file]};
+      if(navigator.share&&(!navigator.canShare||navigator.canShare(imageOnly))){
+        await navigator.share(imageOnly);
         return true;
       }
     }catch(e){
@@ -31,10 +50,12 @@
 
   async function instagramShare(){
     try{
+      const url=votingUrl();
       if(typeof copyVoteLink==='function')await copyVoteLink(true);
-      if(typeof toast==='function')toast('Instagram card ready. In Instagram, choose Story or Post, then tap Next/Share. Your voting link is copied for a Link sticker.');
+      if(typeof toast==='function')toast('Instagram share ready. The voting link is included when supported and copied as a fallback for DMs, captions, or Link stickers.');
       const ok=await shareInstagramCard();
       if(!ok&&typeof nativeShare==='function')await nativeShare();
+      if(!ok&&url&&typeof toast==='function')toast('Voting link copied — paste it into the Instagram message so it is tappable.');
     }catch(e){
       console.error(e);
       if(typeof toast==='function')toast('Could not prepare Instagram share. Try Share anywhere instead.');
