@@ -19,6 +19,10 @@ function vectorText(text,x,y,height,color='#fff',weight=5.2,spacing=.55){
   [...str].forEach((ch,i)=>{const d=GLYPHS[ch]||'';if(d)out+=`<path d="${d}" transform="translate(${x+i*advance} ${y}) scale(${scale})" fill="none" stroke="${color}" stroke-width="${weight}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`});
   return out;
 }
+function centeredVector(text,y,height,color='#fff',weight=5.2,spacing=.55,width=1080){
+  const str=clean(text).toUpperCase(),scale=height/7,advance=(7+spacing)*scale,total=Math.max(0,(str.length-1)*advance+7*scale);
+  return vectorText(str,(width-total)/2,y,height,color,weight,spacing);
+}
 
 async function landscape(A,B,ab,bb){
   const composites=[];
@@ -30,29 +34,28 @@ async function landscape(A,B,ab,bb){
 
 async function story(A,B,ab,bb){
   const composites=[];
-  if(ab){const p=await sharp(ab).resize(460,820,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:55,top:430})}
-  if(bb){const p=await sharp(bb).resize(460,820,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:565,top:430})}
+  if(ab){const p=await sharp(ab).resize(470,900,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:40,top:390})}
+  if(bb){const p=await sharp(bb).resize(470,900,{fit:'contain',background:'#ffffff'}).png().toBuffer();composites.push({input:p,left:570,top:390})}
 
   const base=Buffer.from(`<svg width="1080" height="1920" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#d946ef"/></linearGradient>
-    </defs>
+    <defs><linearGradient id="brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#d946ef"/></linearGradient></defs>
     <rect width="1080" height="1920" fill="#0b0d17"/>
-    <rect x="55" y="100" width="970" height="120" rx="34" fill="#151a2b" stroke="#343b57" stroke-width="3"/>
-    <rect x="82" y="130" width="12" height="60" rx="6" fill="url(#brand)"/>
-    <text x="125" y="178" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="54" font-weight="900" letter-spacing="4">TIEBREAK</text>
-    <text x="540" y="330" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="62" font-weight="800">Help me decide</text>
-    <rect x="55" y="430" width="460" height="820" rx="34" fill="#ffffff"/>
-    <rect x="565" y="430" width="460" height="820" rx="34" fill="#ffffff"/>
-    <rect x="55" y="1285" width="970" height="8" rx="4" fill="url(#brand)"/>
-    <text x="540" y="1435" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="64" font-weight="900">Which would you choose?</text>
-    <text x="540" y="1515" text-anchor="middle" fill="#c4b5fd" font-family="Arial,Helvetica,sans-serif" font-size="54" font-weight="800">A or B?</text>
-    <text x="540" y="1655" text-anchor="middle" fill="#8b93a8" font-family="Arial,Helvetica,sans-serif" font-size="30" font-weight="600" letter-spacing="1">TIEBREAK</text>
+    <rect x="60" y="92" width="960" height="114" rx="30" fill="#151a2b" stroke="#343b57" stroke-width="3"/>
+    <rect x="82" y="122" width="12" height="54" rx="6" fill="url(#brand)"/>
+    ${vectorText('TIEBREAK',118,121,44,'#ffffff',6,.45)}
+    ${centeredVector('WHICH WOULD YOU CHOOSE',270,42,'#ffffff',5.6,.38)}
+    <rect x="40" y="390" width="470" height="900" rx="34" fill="#ffffff"/>
+    <rect x="570" y="390" width="470" height="900" rx="34" fill="#ffffff"/>
+    <rect x="72" y="422" width="88" height="88" rx="24" fill="url(#brand)"/>
+    ${centeredVector('A',439,46,'#ffffff',7,0,232)}
+    <rect x="602" y="422" width="88" height="88" rx="24" fill="url(#brand)"/>
+    <g transform="translate(530 0)">${centeredVector('B',439,46,'#ffffff',7,0,232)}</g>
+    <rect x="40" y="1330" width="1000" height="8" rx="4" fill="url(#brand)"/>
+    ${centeredVector('A OR B',1450,52,'#c4b5fd',6,.45)}
+    ${centeredVector('CAST YOUR VOTE',1545,46,'#ffffff',5.8,.42)}
+    ${centeredVector('TIEBREAK',1745,30,'#7f869b',4.4,.42)}
   </svg>`);
 
-  const overlay=Buffer.from(`<svg width="1080" height="1920" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#d946ef"/></linearGradient></defs><rect x="78" y="455" width="82" height="82" rx="24" fill="url(#brand)"/><text x="119" y="513" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="48" font-weight="900">A</text><rect x="588" y="455" width="82" height="82" rx="24" fill="url(#brand)"/><text x="629" y="513" text-anchor="middle" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="48" font-weight="900">B</text></svg>`);
-
-  composites.push({input:overlay,left:0,top:0});
   return sharp(base).composite(composites).png().toBuffer();
 }
 
