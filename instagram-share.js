@@ -1,8 +1,8 @@
 // Instagram-specific sharing: use a 9:16 card so Instagram does not crop the landscape OG image.
 (function(){
   function instagramImageUrl(){
-    if(!window.state?.shareToken)return '';
-    return `${location.origin}/api/og?token=${encodeURIComponent(window.state.shareToken)}&format=story`;
+    const base=typeof shareImageUrl==='function'?shareImageUrl():'';
+    return base?`${base}&format=story`:'';
   }
 
   async function instagramCardFile(){
@@ -30,7 +30,6 @@
   }
 
   async function instagramShare(){
-    const btn=document.getElementById('shareInstagram');
     try{
       if(typeof copyVoteLink==='function')await copyVoteLink(true);
       if(typeof toast==='function')toast('Instagram card ready. In Instagram, choose Story or Post, then tap Next/Share. Your voting link is copied for a Link sticker.');
