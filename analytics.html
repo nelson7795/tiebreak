@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tiebreak Analytics — Sandbox</title>
+<style>
+:root{--bg:#0b0d17;--panel:#15192a;--line:#303750;--text:#f7f7fb;--muted:#a9afc2;--accent:#8b5cf6;--accent2:#d946ef}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#191a31,#0b0d17 48%);color:var(--text);font-family:Inter,system-ui,-apple-system,sans-serif;min-height:100vh}.wrap{max-width:1050px;margin:auto;padding:28px 18px 60px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:26px}.brand{font-weight:950;letter-spacing:.12em}.pill{font-size:.74rem;font-weight:900;letter-spacing:.08em;padding:7px 10px;border-radius:999px;background:#282344;color:#c4b5fd}.muted{color:var(--muted)}h1{font-size:clamp(2rem,6vw,3.4rem);margin:4px 0 8px;letter-spacing:-.04em}.controls{display:flex;gap:8px;align-items:center}.controls select,.controls button{background:#181e30;border:1px solid #3a4260;color:#fff;border-radius:12px;padding:10px 12px;font-weight:800}.controls button{cursor:pointer}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:22px 0}.card,.panel{background:linear-gradient(180deg,#171c2d,#111625);border:1px solid var(--line);border-radius:18px}.card{padding:18px}.card strong{display:block;font-size:2rem;margin-bottom:4px}.card span{font-size:.84rem;color:var(--muted)}.panel{padding:20px;margin-top:14px}.panel h2{margin:0 0 14px;font-size:1.2rem}.funnel{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.step{padding:14px 10px;background:#0f1421;border-radius:14px;text-align:center}.step b{font-size:1.3rem;display:block}.step small{color:var(--muted)}.rates{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.rate{padding:8px 10px;border-radius:999px;background:#242b42;font-size:.82rem;color:#dfe2ef}.table{width:100%;border-collapse:collapse;font-size:.9rem}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid #2b3249}.table th{color:#aeb4c7;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em}.empty{padding:20px;text-align:center;color:var(--muted)}.merchant{display:flex;gap:10px;flex-wrap:wrap}.merchant span{background:#242b42;padding:9px 12px;border-radius:999px;font-weight:800}.error{background:#3a1822;border:1px solid #7a3448;padding:12px;border-radius:12px}.hidden{display:none}@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.funnel{grid-template-columns:1fr}.top{align-items:flex-start;flex-direction:column}.controls{width:100%}.controls select,.controls button{flex:1}}@media(max-width:430px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="top"><div><div class="brand">TIEBREAK</div><span class="pill">SANDBOX ANALYTICS</span></div><div class="controls"><select id="days"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select><button id="refresh">Refresh</button></div></div>
+<h1>Analytics v1</h1><p class="muted">The funnel that tells us whether Tiebreak is becoming a business.</p>
+<div id="error" class="error hidden"></div>
+<div class="grid">
+<div class="card"><strong id="created">—</strong><span>Tiebreaks created</span></div>
+<div class="card"><strong id="shares">—</strong><span>Share opens</span></div>
+<div class="card"><strong id="views">—</strong><span>Voting-page views</span></div>
+<div class="card"><strong id="unique">—</strong><span>Unique voting sessions</span></div>
+<div class="card"><strong id="votes">—</strong><span>Votes cast</span></div>
+<div class="card"><strong id="clicks">—</strong><span>Retailer clicks</span></div>
+</div>
+<div class="panel"><h2>Conversion funnel</h2><div class="funnel">
+<div class="step"><b id="fCreated">0</b><small>Created</small></div><div class="step"><b id="fShares">0</b><small>Shared</small></div><div class="step"><b id="fViews">0</b><small>Views</small></div><div class="step"><b id="fVotes">0</b><small>Votes</small></div><div class="step"><b id="fClicks">0</b><small>Clicks</small></div>
+</div><div class="rates"><span class="rate" id="voteRate">Vote rate —</span><span class="rate" id="clickRate">Click rate —</span><span class="rate" id="viralRate">Create-another —</span></div></div>
+<div class="panel"><h2>Retailer clicks</h2><div id="merchants" class="merchant"><span>No clicks yet</span></div></div>
+<div class="panel"><h2>Top Tiebreaks</h2><div id="topEmpty" class="empty">No Tiebreak activity yet.</div><table id="topTable" class="table hidden"><thead><tr><th>Tiebreak</th><th>Views</th><th>Votes</th><th>Clicks</th></tr></thead><tbody id="topBody"></tbody></table></div>
+</div>
+<script>
+const U='https://ihnfetkbsrlsodabxsam.supabase.co',K='sb_publishable_Zz7PZEK_yAZFCcm6DqJ5BA_vsoXCjks';
+const $=id=>document.getElementById(id);const fmt=n=>Number(n||0).toLocaleString();const pct=(n,d)=>d?Math.round(n/d*100)+'%':'—';
+async function load(){
+ $('error').classList.add('hidden');
+ try{
+  const r=await fetch(`${U}/rest/v1/rpc/get_sandbox_analytics_summary`,{method:'POST',headers:{apikey:K,Authorization:`Bearer ${K}`,'Content-Type':'application/json'},body:JSON.stringify({p_days:+$('days').value})});
+  if(!r.ok)throw Error(await r.text());const d=await r.json();
+  [['created',d.created],['shares',d.shares],['views',d.vote_views],['unique',d.unique_vote_viewers],['votes',d.votes],['clicks',d.product_clicks],['fCreated',d.created],['fShares',d.shares],['fViews',d.vote_views],['fVotes',d.votes],['fClicks',d.product_clicks]].forEach(([id,v])=>$(id).textContent=fmt(v));
+  $('voteRate').textContent=`Vote rate ${pct(d.votes,d.vote_views)}`;
+  $('clickRate').textContent=`Retailer click rate ${pct(d.product_clicks,d.vote_views)}`;
+  $('viralRate').textContent=`Create-another ${pct(d.create_another,d.vote_views)}`;
+  const ms=Object.entries(d.merchants||{});$('merchants').innerHTML=ms.length?ms.sort((a,b)=>b[1]-a[1]).map(([m,n])=>`<span>${m}: ${fmt(n)}</span>`).join(''):'<span>No clicks yet</span>';
+  const rows=d.top_tiebreaks||[];$('topEmpty').classList.toggle('hidden',rows.length>0);$('topTable').classList.toggle('hidden',rows.length===0);$('topBody').innerHTML=rows.map(x=>`<tr><td>${String(x.share_token||'').slice(0,8)}…</td><td>${fmt(x.views)}</td><td>${fmt(x.votes)}</td><td>${fmt(x.clicks)}</td></tr>`).join('');
+ }catch(e){$('error').textContent='Could not load analytics: '+(e.message||e);$('error').classList.remove('hidden')}
+}
+$('refresh').onclick=load;$('days').onchange=load;load();
+</script></body></html>
