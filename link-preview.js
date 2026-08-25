@@ -48,3 +48,9 @@ if(facebookShareButton){
     window.location.assign(facebookUrl);
   };
 }
+
+// SANDBOX ONLY: load Analytics v1 after the existing app is fully initialized.
+const analyticsScript=document.createElement('script');
+analyticsScript.src='/analytics.js';
+analyticsScript.defer=true;
+document.head.appendChild(analyticsScript);
