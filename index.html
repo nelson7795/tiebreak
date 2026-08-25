@@ -27,6 +27,9 @@
 
 <div id="shareHub" class="editor-overlay hidden"><div class="share-modal"><div class="editor-head"><div><span class="eyebrow">SHARE</span><h3>Get more votes</h3></div><button id="closeShareHub" class="secondary small">✕</button></div><p class="muted share-intro">Send your Tiebreak to friends so they can tap the link and vote.</p><div class="share-card-preview"><img id="shareCardImage" alt="Tiebreak social share card"></div><div class="social-grid"><button id="shareMore" class="primary social-btn">Text / Share link</button><button id="shareFacebook" class="social-btn">Facebook</button></div><button id="copyVoteLink" class="secondary wide">Copy voting link</button><p class="share-tip">Text / Share link opens your phone’s sharing menu for Messages, group chats, email, and other apps. Facebook shares the Tiebreak card and voting page.</p></div></div>
 
+<!-- Legacy hooks retained invisibly so existing production sharing JS does not abort after removing these UI buttons. -->
+<div hidden aria-hidden="true"><button id="shareInstagram" type="button"></button><button id="shareTikTok" type="button"></button><button id="shareSnapchat" type="button"></button></div>
+
 <footer class="affiliate-disclosure">Tiebreak may earn commissions from qualifying purchases.</footer>
 <div style="position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden;">Impact-Site-Verification: 462e2240-5044-4566-9a21-d42d6c306106</div>
 <div id="toast" class="toast"></div>
